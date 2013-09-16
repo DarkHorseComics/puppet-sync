@@ -124,6 +124,11 @@ class PuppetSync
 
         output "Touch: #{STAMP}" if @options.verbose
         FileUtils.touch(STAMP)
+
+        if @options.librarian
+          Dir.mkdir('.tmp')
+          execute('librarian-puppet install')
+        end
       end
     end
   rescue => exception
@@ -183,6 +188,10 @@ class PuppetSync
 
     opts.on('-D', '--delete', 'Remove the specified branch from the deployment directory.') do
       @options.delete = true
+    end
+
+    opts.on('-l', '--librarian-puppet', 'Comma-seperated list of submodule paths to enable.') do
+      @options.librarian = true
     end
 
     opts.on('-r', '--repository URL', 'Git url for the repository.') do |repo|
