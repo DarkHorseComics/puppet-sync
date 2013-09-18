@@ -113,7 +113,14 @@ class PuppetSync
         else
           git(:submodule, 'update --init --recursive')
         end
-        git(:clean, '-d -x -f')
+
+        # Prevent librarian from reinstalling the modules every time
+        if @options.librarian
+          git(:clean, '-d -x -f -e .tmp -e modules'
+        else
+          git(:clean, '-d -x -f')
+        end
+
         ls_files = git(:"ls-files", '--other --exclude-standard')
         unless ls_files == ""
           ls_files.each do |path|

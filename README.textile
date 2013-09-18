@@ -11,6 +11,7 @@ Usage: puppet-sync -b BRANCH [options]
     -d, --deploy DIR                 Specify the directory to deploy to.
     -e, --environment DIR            Specify the name of the environment to deploy to, defaults to the branch.
     -D, --delete                     Remove the specified branch from the deployment directory.
+    -l, --librarian                  Use librarian-puppet to install packages from Puppetfile
     -r, --repository URL             Git url for the repository.
     -s SUBMODULES                    Comma-seperated list of submodule paths to enable.
         --submodules-enabled
