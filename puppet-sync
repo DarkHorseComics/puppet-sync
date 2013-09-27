@@ -113,30 +113,23 @@ class PuppetSync
         else
           git(:submodule, 'update --init --recursive')
         end
-
-        # Prevent librarian from reinstalling the modules every time
         if @options.librarian
-          git(:clean, '-d -x -f -e .tmp -e modules')
-          ls_files = git(:"ls-files", '--other --exclude-standard -x .tmp -x modules')
+          git(:clean, '-d -x -f -e .tmp -e modules/')
+          Dir.mkdir('.tmp') unless File.exists?('.tmp')
+          execute('librarian-puppet install')
         else
-          git(:clean, '-d -x -f')
-          ls_files = git(:"ls-files", '--other --exclude-standard')
-        end
-
-        unless ls_files == ""
-          ls_files.each do |path|
-            output "Recursively deleting untracked file(s) #{path.chomp}" if @options.verbose
-            FileUtils.remove_entry_secure(path.chomp)
-          end
-        end
+					git(:clean, '-d -x -f')
+					ls_files = git(:"ls-files", '--other --exclude-standard')
+					unless ls_files == ""
+						ls_files.each do |path|
+							output "Recursively deleting untracked file(s) #{path.chomp}" if @options.verbose
+							FileUtils.remove_entry_secure(path.chomp)
+						end
+					end
+				end
 
         output "Touch: #{STAMP}" if @options.verbose
         FileUtils.touch(STAMP)
-
-        if @options.librarian
-          Dir.mkdir('.tmp') unless File.exists?('.tmp')
-          execute('librarian-puppet install')
-        end
       end
     end
   rescue => exception
