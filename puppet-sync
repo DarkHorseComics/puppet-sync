@@ -75,6 +75,7 @@ class PuppetSync
     output "Deploy To   : #{deploy}" unless @options.delete
     output "Delete From : #{deploy}" if @options.delete
     output "Repository  : #{@options.repository}"
+    output "Librarian   : #{@options.librarian}"
 
     self.update(@options.branch, @options.environment, :delete => @options.delete)
 
@@ -104,7 +105,7 @@ class PuppetSync
       Dir.chdir(deploy) do
         git(:fetch, 'origin')
         git(:reset, '--hard')
-        git(:checkout, "origin/#{branch}")
+        git(:checkout, "-f origin/#{branch}")
         git(:submodule, 'sync', @options.submodules)
         git(:submodule, 'foreach --recursive "git checkout -f HEAD"')
         git(:submodule, 'foreach --recursive "git clean -d -x -f"')
@@ -114,9 +115,9 @@ class PuppetSync
           git(:submodule, 'update --init --recursive')
         end
         if @options.librarian
-          git(:clean, '-d -x -f -e .tmp -e modules/')
+          git(:clean, '-d -x -ff -e .tmp -e modules/')
           Dir.mkdir('.tmp') unless File.exists?('.tmp')
-          execute('librarian-puppet install')
+          execute('librarian-puppet install > /tmp/lbi')
         else
 					git(:clean, '-d -x -f')
 					ls_files = git(:"ls-files", '--other --exclude-standard')
